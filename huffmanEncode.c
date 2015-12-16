@@ -16,7 +16,7 @@
 /************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <math.h>
 
 /* Max tree depth and therefore max code length */
@@ -29,20 +29,20 @@ int frequencyMap[256] = {0};
 int huffmanValues[256][maxHeight];
 
 /* Does-it-all Node */
-struct QueueNode 
+struct QueueNode
 {
   /* The ASCII character*/
   int data;
-  
+
   /* The character's frequency */
   int frequency;
-  
+
   /* Left child of current node */
   struct QueueNode* left;
-  
+
   /* Right child of current node */
   struct QueueNode* right;
-  
+
   /* Next node in list */
   struct QueueNode* next;
 };
@@ -63,7 +63,7 @@ void countFrequencies(FILE* in)
   int c;
 
   /* While not EOF, get next character, add to frequencyMap */
-  while((c = getc(in)) != EOF) 
+  while((c = getc(in)) != EOF)
   {
     if(c > 256 || c < 0) printf("What is this?? %d=%c\n", c, c);
     else frequencyMap[c]++;
@@ -75,12 +75,12 @@ void countFrequencies(FILE* in)
  *
  * The function takes a new node, newNode, and inserts it into the correct position
  * in the existing linked list, starting at head. Returns the (maybe new) head.
- */ 
+ */
 struct QueueNode* insertSorted(struct QueueNode* head, struct QueueNode* newNode)
 {
   struct QueueNode* current = head;
-  
-  /* If the list-tree is empty or the new node's frequency is less than 
+
+  /* If the list-tree is empty or the new node's frequency is less than
      the smallest (head) node's frequency, add it there */
   if(head == NULL || newNode->frequency < head->frequency)
   {
@@ -88,15 +88,15 @@ struct QueueNode* insertSorted(struct QueueNode* head, struct QueueNode* newNode
     return newNode;
   }
 
-  /* Keep checking that there is another node after current node and next node 
-     freq is less than new node's freq, then put the new node at the current 
-     position (where either of these are untrue: end of list or 
+  /* Keep checking that there is another node after current node and next node
+     freq is less than new node's freq, then put the new node at the current
+     position (where either of these are untrue: end of list or
      new node < existing node) */
 
   else
   {
     /* Comparing unequal frequencies */
-    while(current->next != NULL && current->next->frequency < newNode->frequency) 
+    while(current->next != NULL && current->next->frequency < newNode->frequency)
       current = current->next;
 
     if(head->frequency == newNode->frequency && head->data > newNode->data)
@@ -106,8 +106,8 @@ struct QueueNode* insertSorted(struct QueueNode* head, struct QueueNode* newNode
     }
 
     /* Comparing unequal data (ASCII) values with equal frequency values */
-    while(current->next != NULL && current->next->frequency == newNode->frequency && 
-	  current->next->data < newNode->data) 
+    while(current->next != NULL && current->next->frequency == newNode->frequency &&
+	  current->next->data < newNode->data)
       current = current->next;
   }
   newNode->next = current->next;
@@ -117,9 +117,9 @@ struct QueueNode* insertSorted(struct QueueNode* head, struct QueueNode* newNode
 /**************************************************************************************
  * struct QueueNode* createNodeLinked(struct QueueNode* head, int data, int frequency)
  *
- * Creates a node with given data, data, and frequency, frequency, and inserts it 
+ * Creates a node with given data, data, and frequency, frequency, and inserts it
  * in the correct location. Returns the head.
- */ 
+ */
 struct QueueNode* createNodeLinked(struct QueueNode* head, int data, int frequency)
 {
   /* Make space for new node to insert */
@@ -137,7 +137,7 @@ struct QueueNode* createNodeLinked(struct QueueNode* head, int data, int frequen
 
 /*********************************************************************************************
  * void printQueue(struct QueueNode* head)
- * 
+ *
  * Internal function used for debuggging.
  * Prints the linked list.
  */
@@ -145,24 +145,24 @@ void printQueue(struct QueueNode* head)
 {
   /* Node for iterating */
   struct QueueNode* current = head;
-  
+
   /* Iterating while the current node isn't null to print values for debugging */
   while(current != NULL)
   {
-    if(current->data < 33 || current->data > 126) 
+    if(current->data < 33 || current->data > 126)
       printf("=%d occurred %d times\n", current->data, current->frequency);
-    
+
     else printf("%c occurred %d times\n", current->data, current->frequency);
     current = current->next;
   }
   printf("\n");
-}   
+}
 
 /*************************************************************
  * void freeQueue(struct QueueNode* head)
  *
  * Unused function. Frees a linkedlist at
- * head. 
+ * head.
  */
 void freeQueue(struct QueueNode* head)
 {
@@ -180,7 +180,7 @@ void freeQueue(struct QueueNode* head)
  * struct QueueNode* createNodeTree (struct QueueNode* head)
  *
  * Makes a node that is the root of two or more combined
- * nodes when building the Huffman tree. Takes the first 
+ * nodes when building the Huffman tree. Takes the first
  * nodes from a sorted list, starting at head. Returns the
  * new head.
  */
@@ -190,8 +190,8 @@ struct QueueNode* createNodeTree (struct QueueNode* head)
   struct QueueNode* newNode = malloc(sizeof(struct QueueNode));
 
   /* Make the ndoe to be the new head */
-  struct QueueNode* newHead;  
-  
+  struct QueueNode* newHead;
+
   /* Initialize values of the new node, change pointers of children */
   newNode->data = head->next->data;
   newNode->frequency = (head->frequency) + (head->next->frequency);
@@ -202,21 +202,21 @@ struct QueueNode* createNodeTree (struct QueueNode* head)
   newHead = head->next->next;
   head->next->next = NULL;
   head->next = NULL;
-  
+
   /* Insert new root with children back into queue */
   return insertSorted(newHead, newNode);
-	
+
 }
 
 /****************************************************************
  * struct QueueNode* buildTree(struct QueueNode* head)
  *
- * Calls createNodeTree on a queue at head, which combines two 
+ * Calls createNodeTree on a queue at head, which combines two
  * nodes until only one remains and a huffman tree is formed.
  * Returns the tree root.
  */
 struct QueueNode* buildTree(struct QueueNode* head)
-{ 
+{
   while(head->next != NULL)
     head = createNodeTree(head);
 
@@ -236,18 +236,18 @@ void printTree(struct QueueNode* head)
     printTree(head->left);
 
     /* If this isn't a leaf/child, incidate so */
-    if(head->left != NULL && head->right != NULL) 
-      printf("Parent of left:%d%c and right:%d%c; node:%d%c\n", 
-	     head->left->frequency, head->left->data, 
-	     head->right->frequency, head->right->data, 
+    if(head->left != NULL && head->right != NULL)
+      printf("Parent of left:%d%c and right:%d%c; node:%d%c\n",
+	     head->left->frequency, head->left->data,
+	     head->right->frequency, head->right->data,
 	     head->frequency, head->data);
 
     /* Its a child/leaf, so indicate its values */
     else
     {
-      if(head->data < 33 || head->data > 126) 
+      if(head->data < 33 || head->data > 126)
 	printf("=%d occurred %d times\n", head->data, head->frequency);
-      
+
       else printf("%c occurred %d times\n", head->data, head->frequency);
     }
 
@@ -257,7 +257,7 @@ void printTree(struct QueueNode* head)
 
 /*****************************************************************************
  * void freeTree(struct QueueNode* head)
- * 
+ *
  * Frees the tree starting at head from memory.
  */
 void freeTree(struct QueueNode* head)
@@ -281,7 +281,7 @@ void freeTree(struct QueueNode* head)
 void storeCodes(int arr[], int n, int data)
 {
   int i;
-  
+
   /* First array value is how long the huffman code is
      for later book-keeping */
   huffmanValues[data][0] = n;
@@ -317,16 +317,16 @@ void printDataValues()
 
       /* It's printing ASCII */
       else printf("%c\t%d\t", i, frequencyMap[i]);
-      
-      for(j = 1; j < huffmanValues[i][0] + 1; j++) 
+
+      for(j = 1; j < huffmanValues[i][0] + 1; j++)
 	printf("%d", huffmanValues[i][j]);
-      
+
       printf("\n");
     }
   }
 }
 
-/************************************************************************* 
+/*************************************************************************
  * void generateCodes(struct QueueNode* root, int arr[], int top)
  *
  * Generates the huffman codes with the given tree at root.
@@ -371,7 +371,7 @@ void generateCodesHelper(struct QueueNode* root)
 /**********************************************************************
 * struct bitNode* createNodeInsert(struct bitNode* head, int data)
 *
-* Creates a bitNode and inserts it at the end of the currently 
+* Creates a bitNode and inserts it at the end of the currently
 * existing bitNodes. Data is the bit value of the node, and head is
 * this head of the bitNode linked list.
 */
@@ -387,7 +387,7 @@ struct bitNode* createNodeInsert(struct bitNode* head, int data)
 
   /* Put new node in list */
   if(head == NULL) return node;
-  else 
+  else
   {
     while(current->nextBit != NULL) current = current->nextBit;
     current->nextBit = node;
@@ -397,10 +397,10 @@ struct bitNode* createNodeInsert(struct bitNode* head, int data)
 
 /**************************************************************
  * int bitAmount(struct bitNode* head)
- * 
- * Helper function that calculates the current amount of 
+ *
+ * Helper function that calculates the current amount of
  * bitNodes in existance to see if a byte can be output.
- * head is the head of the bitNode list. 
+ * head is the head of the bitNode list.
  */
 int bitAmount(struct bitNode* head)
 {
@@ -427,7 +427,7 @@ struct bitNode* outputByte(struct bitNode* head, FILE* out)
   struct bitNode* current = head;
 
   /* Build the number from the given bits */
-  for(i = 0; i < 8; i++)  
+  for(i = 0; i < 8; i++)
   {
     output += (current->bit) * pow(2, i);
     current = current->nextBit;
@@ -439,7 +439,7 @@ struct bitNode* outputByte(struct bitNode* head, FILE* out)
     current = head->nextBit;
     free(head);
     head = current;
-  }   
+  }
 
   /* Output the byte */
   fputc(output, out);
@@ -450,7 +450,7 @@ struct bitNode* outputByte(struct bitNode* head, FILE* out)
 /************************************************************
  * void encode(FILE* in, FILE* out)
  *
- * Top level function that calls helper functions for 
+ * Top level function that calls helper functions for
  * encding. While the input steam, in, is not at the end,
  * encodes bytes and puts them to the output stream, out.
  */
@@ -459,8 +459,8 @@ void encode(FILE* in, FILE* out)
   int i;
   int c;
   struct bitNode* head = NULL;
-  
-  
+
+
   /* While not EOF */
   while(!feof(in))
   {
@@ -471,19 +471,19 @@ void encode(FILE* in, FILE* out)
     {
       head = createNodeInsert(head, huffmanValues[c][i]);
     }
-  
+
     /* If we have enough to make a byte, do so */
-    if(bitAmount(head) > 7) 
+    if(bitAmount(head) > 7)
       {
 	head = outputByte(head, out);
-      }	
+      }
   }
 
   /* If the file ends but a bit isn't full, pad it with zeroes */
 
   if(bitAmount(head) % 8)
   {
-    while(bitAmount(head) % 8) 
+    while(bitAmount(head) % 8)
     {
       createNodeInsert(head, 0);
     }
@@ -503,10 +503,10 @@ void writeSymbolAndFreq(FILE* out)
   unsigned char symbol;
   unsigned long frequency;
   unsigned short symbolCount;
-  
-  /* Loop over gathered frequencies to output the 
+
+  /* Loop over gathered frequencies to output the
      total symbols */
-  for(i = 0; i < 256; i++) 
+  for(i = 0; i < 256; i++)
     if(frequencyMap[i] > 0) symbolCount++;
 
   fwrite(&symbolCount, sizeof(unsigned short), 1, out);
@@ -537,12 +537,12 @@ int main(int argc, char** argv)
   unsigned long encodedCount;
 
   /* Check for valid amount of args */
-  if(argc != 3) 
+  if(argc != 3)
   {
     printf("wrong number of args\n");
     return 1;
   }
-  
+
   infile = argv[1];
   outfile = argv[2];
 
@@ -564,13 +564,13 @@ int main(int argc, char** argv)
 
   /* Count the frequencies of characters in the in file. */
   countFrequencies(in);
-  
+
   /* Go to top of input file for encoding. */
   rewind(in);
 
   /* Make linked list of files. */
-  for(i = 0; i < 256; i++) 
-    if(frequencyMap[i] > 0) 
+  for(i = 0; i < 256; i++)
+    if(frequencyMap[i] > 0)
       head = createNodeLinked(head, i, frequencyMap[i]);
 
   /* Build huffman tree. */
@@ -579,7 +579,7 @@ int main(int argc, char** argv)
   /* Write symbols and frequencies, encoded, to file. */
   writeSymbolAndFreq(out);
 
-  /* Write total amout of symbols to file. */
+  /* Write total amount of symbols to file. */
   encodedCount = head->frequency;
   fwrite(&encodedCount, sizeof(unsigned long), 1, out);
 
